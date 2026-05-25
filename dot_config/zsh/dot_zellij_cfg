@@ -1,0 +1,136 @@
+
+# ==============================================================================
+# --- 1. 基础配置 ---
+# ==============================================================================
+export ZELLIJ_DEFAULT_LAYOUT="${ZELLIJ_DEFAULT_LAYOUT:-zjstatus}"
+
+# 避免重复 source 时旧 alias 干扰函数定义
+unalias zk zka zja zjp 2>/dev/null
+
+alias zj='zellij'
+alias zl='zellij list-sessions'
+
+# 快速用默认编辑器 (Vim/Neovim) 在新窗口打开文件
+alias ze='zellij edit'
+
+# 在新窗格中运行命令，完成后按任意键退出
+alias zr='zellij run --'
+
+# 在浮动窗口中运行命令 (例如: zrf -- lazygit)
+alias zrf='zellij run --floating --'
+
+# ==============================================================================
+# --- 2. 内部工具 ---
+# ==============================================================================
+_zellij_sessions() {
+  zellij list-sessions --no-formatting 2>/dev/null | awk '{print $1}'
+}
+
+_zellij_has_session() {
+  _zellij_sessions | grep -Fxq "$1"
+}
+
+_zellij_pick_session() {
+  if ! command -v fzf >/dev/null 2>&1; then
+    echo "未找到 fzf，请传入 session 名称。" >&2
+    return 1
+  fi
+
+  _zellij_sessions | fzf \
+    --height 40% \
+    --reverse \
+    --border \
+    --prompt="zellij> " \
+    --header="Ctrl-j/k 移动，Ctrl-u/d 翻页，Enter 选择，Esc 取消" \
+    --bind="ctrl-j:down,ctrl-k:up,ctrl-d:page-down,ctrl-u:page-up"
+}
+
+_zellij_confirm() {
+  local reply
+  printf "%s [y/N] " "$1"
+  read -r reply
+
+  case "$reply" in
+    [yY]|[yY][eE][sS]) return 0 ;;
+    *) return 1 ;;
+  esac
+}
+
+# ==============================================================================
+# --- 3. 会话入口 ---
+# ==============================================================================
+zja() {
+  local session
+
+  if [ $# -eq 0 ]; then
+    session=$(_zellij_pick_session) || return 1
+    [ -n "$session" ] || { echo "已取消。"; return 1; }
+    zellij attach "$session"
+    return
+  fi
+
+  session="$1"
+  if _zellij_has_session "$session"; then
+    zellij attach "$session"
+  else
+    zellij attach --create "$session"
+  fi
+}
+
+# 用当前目录名作为项目 session，适合 Vim/Neovim 项目流
+zjp() {
+  local session
+  session="${1:-${PWD:t}}"
+  zja "$session"
+}
+
+# ==============================================================================
+# --- 4. 删除会话 ---
+# ==============================================================================
+zk() {
+  local session
+
+  if [ $# -gt 0 ]; then
+    for session in "$@"; do
+      zellij delete-session --force "$session"
+    done
+    return
+  fi
+
+  session=$(_zellij_pick_session) || return 1
+  [ -n "$session" ] || { echo "已取消。"; return 1; }
+
+  if _zellij_confirm "确认强制删除 session：$session？"; then
+    zellij delete-session --force "$session"
+  else
+    echo "已取消。"
+    return 1
+  fi
+}
+
+zka() {
+  local sessions
+  sessions=$(_zellij_sessions)
+
+  if [ -z "$sessions" ]; then
+    echo "没有可删除的 Zellij 会话。"
+    return 0
+  fi
+
+  echo "将强制删除以下 Zellij 会话："
+  printf '%s\n' "$sessions" | sed 's/^/  - /'
+
+  if _zellij_confirm "确认删除全部会话？"; then
+    if [ -n "$ZELLIJ" ]; then
+      mkdir -p "${TMPDIR:-/tmp}"
+      nohup zsh -lc 'sleep 0.2; zellij delete-all-sessions --force --yes' \
+        > "${TMPDIR:-/tmp}/zellij-zka.log" 2>&1 < /dev/null &!
+      zellij action detach 2>/dev/null || true
+    else
+      zellij delete-all-sessions --force --yes
+    fi
+  else
+    echo "已取消。"
+    return 1
+  fi
+}

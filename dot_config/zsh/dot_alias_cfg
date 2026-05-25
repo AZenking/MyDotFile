@@ -1,0 +1,25 @@
+# webstorm
+alias wb=webstorm
+
+# pnpm   
+alias pn=pnpm
+alias pnd='pnpm dlx'
+# vim 
+alias vi=nvim
+
+# lsd
+alias ls='lsd'
+
+
+alias cc='claude'
+alias c='clear'
+alias codegh='codegraph'
+alias lg='lazygit'
+function gw(){
+  gaia cw -$1
+}
+
+function nv() {
+  npm view $1 versions
+}
+

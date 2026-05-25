@@ -1,0 +1,75 @@
+# --- 基础 alias ---
+alias t='tmux'
+alias tn='tmux new -s'
+alias ta='tmux attach -t'
+alias tls='tmux ls'
+alias tk='tmux kill-session -t'
+alias tka='tmux kill-server'
+alias tr='tmux rename-session -t'
+alias tw='tmux new-window -n'
+alias tl='tmux list-windows'
+alias td='tmux detach'
+
+# --- 智能 attach / new ---
+tma() {
+  # 检查是否在交互式终端中
+  if [ ! -t 1 ]; then
+    echo "❌ 当前环境不是交互式终端 (TTY)，无法使用 fzf 选择。"
+    echo "请在终端中运行 tma 命令。"
+    return 1
+  fi
+
+  # 无参数 -> fzf 选择会话
+  if [ -z "$1" ]; then
+    local session
+    session=$(tmux ls 2>/dev/null | awk -F: '{print $1}' | fzf --height 40% --reverse --border)
+    if [ -n "$session" ]; then
+      tmux attach -t "$session"
+    else
+      echo "未选择任何 tmux 会话。"
+    fi
+  else
+    # 有参数 -> attach or new
+    tmux attach -t "$1" 2>/dev/null || tmux new -s "$1"
+  fi
+}
+# --- 快速切换窗口 ---
+tmw() {
+  # 检查是否在交互式终端中
+  if [ ! -t 1 ]; then
+    echo "❌ 当前环境不是交互式终端 (TTY)，无法使用 fzf 选择窗口。"
+    echo "请在终端中运行 tmw 命令。"
+    return 1
+  fi
+
+  # 确认是否在 tmux 会话中
+  if [ -z "$TMUX" ]; then
+    echo "⚠️ 当前不在 tmux 会话中，请先进入 tmux 再使用 tmw。"
+    return 1
+  fi
+
+  # 获取窗口列表并选择
+  local target win_id
+  target=$(tmux list-windows -F '#{window_index}:#{window_name}' 2>/dev/null | fzf --height 40% --reverse --border --prompt="选择窗口: ")
+  
+  if [[ -n "$target" ]]; then
+    win_id="${target%%:*}"
+    # 调试输出
+    tmux select-window -t "${win_id}"
+  else
+    echo "未选择任何窗口。"
+  fi
+}
+
+# --- 会话保存 / 恢复 ---
+alias tsave='tmux run-shell ~/.tmux/plugins/tmux-resurrect/scripts/save.sh'
+alias trestore='tmux run-shell ~/.tmux/plugins/tmux-resurrect/scripts/restore.sh'
+
+# --- 常用会话 ---
+alias tdev='tmux attach -t dev || tmux new -s dev'
+alias twork='tmux attach -t work || tmux new -s work'
+alias tplay='tmux attach -t play || tmux new -s play'
+
+# --- FZF 常规增强 ---
+export FZF_DEFAULT_OPTS='--height 40% --reverse --border --preview-window=down:3:hidden:wrap'
+export FZF_CTRL_T_COMMAND='fd --type f --hidden --follow --exclude .git'
