@@ -1,0 +1,25 @@
+source ~/lazy-idea/.ideavimrc
+
+set ignorecase
+set smartcast
+set NERDTree
+set highlightedyank
+set hlsearch
+
+imap jj <Esc>
+imap jk <Esc>:w<CR>
+nmap <leader>e :NERDTreeToggle<CR>
+nmap <leader>E :NERDTreeFind<CR>
+" <A-n> is used to enter accented text e.g. ñ
+nmap s <Action>(flash.search)
+xmap s <Action>(flash.search)
+" 选中下一个匹配（多光标）
+nnoremap <C-n> :action EditorAddSelectionForNextOccurrence<CR>
+xnoremap <C-n> :action EditorAddSelectionForNextOccurrence<CR>
+
+" 选中所有匹配
+nnoremap <leader><C-n> :action EditorSelectAllOccurrences<CR>
+xnoremap <leader><C-n> :action EditorSelectAllOccurrences<CR>
+
+" 退出多光标
+nnoremap <Esc> :action EditorEscape<CR>
