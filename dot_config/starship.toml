@@ -1,0 +1,162 @@
+"$schema" = 'https://starship.rs/config-schema.json'
+
+format = """
+[](dragon_gray)\
+$os\
+[](bg:dragon_orange fg:dragon_gray)\
+$directory\
+[](fg:dragon_orange bg:dragon_green)\
+$git_branch\
+$git_status\
+[](fg:dragon_green bg:dragon_aqua)\
+$c\
+$rust\
+$golang\
+$nodejs\
+$php\
+$java\
+$kotlin\
+$haskell\
+$python\
+[](fg:dragon_aqua bg:dragon_blue)\
+$docker_context\
+[](fg:dragon_blue bg:dragon_violet)\
+$time\
+[ ](fg:dragon_violet)\
+$line_break$character"""
+
+palette = 'kanagawa_dragon'
+
+[palettes.kanagawa_dragon]
+# Kanagawa Dragon (Deep Dark Theme) Palette
+dragon_black0 = "#0d0c10" # Extremely dark background
+dragon_black1 = "#121216" # Heavy charcoal background
+dragon_black3 = "#1a1a22" # Dark container gray
+dragon_gray   = "#6a6a73" # Ash gray for OS/User
+dragon_white  = "#c5c9c5" # Crisp bone white for text
+dragon_blue   = "#658594" # Storm blue
+dragon_green  = "#87a987" # Moss green
+dragon_aqua   = "#6a9589" # Deep teal/aqua
+dragon_orange = "#b6927b" # Muddy orange / copper
+dragon_pink   = "#a292a3" # Slate pink
+dragon_violet = "#897f98" # Shadow violet
+dragon_red    = "#c4746e" # Muted blood red
+
+[os]
+disabled = false
+style = "bg:dragon_gray fg:dragon_white"
+
+[os.symbols]
+Windows = "󰍲"
+Ubuntu = "󰕈"
+SUSE = ""
+Raspbian = "󰐿"
+Mint = "󰣭"
+Macos = ""
+Manjaro = ""
+Linux = "󰌽"
+Gentoo = "󰣨"
+Fedora = "󰣛"
+Alpine = ""
+Amazon = ""
+Android = ""
+Arch = "󰣇"
+Artix = "󰣇"
+CentOS = ""
+Debian = "󰣚"
+Redhat = "󱄛"
+RedHatEnterprise = "󱄛"
+
+[directory]
+style = "fg:dragon_black0 bg:dragon_orange"
+format = "[ $path ]($style)"
+truncation_length = 3
+truncation_symbol = "…/"
+
+[directory.substitutions]
+"Documents" = "󰈙 "
+"Downloads" = " "
+"Music" = "󰝚 "
+"Pictures" = " "
+"Developer" = "󰲋 "
+
+[git_branch]
+symbol = ""
+style = "bg:dragon_aqua"
+format = '[[ $symbol $branch ](fg:dragon_black0 bg:dragon_green)]($style)'
+
+[git_status]
+style = "fg:dragon_white bg:dragon_aqua"
+format = '[$all_status$ahead_behind]($style)'
+ahead = '⇡${count}'
+diverged = '⇕⇡${ahead_count}⇣${behind_count}'
+behind = '⇣${count}'
+
+[nodejs]
+symbol = ""
+style = "bg:dragon_aqua"
+format = '[[ $symbol( $version) ](fg:dragon_black0 bg:dragon_aqua)]($style)'
+
+[c]
+symbol = " "
+style = "bg:dragon_aqua"
+format = '[[ $symbol( $version) ](fg:dragon_black0 bg:dragon_aqua)]($style)'
+
+[rust]
+symbol = ""
+style = "bg:dragon_aqua"
+format = '[[ $symbol( $version) ](fg:dragon_black0 bg:dragon_aqua)]($style)'
+
+[golang]
+symbol = ""
+style = "bg:dragon_aqua"
+format = '[[ $symbol( $version) ](fg:dragon_black0 bg:dragon_aqua)]($style)'
+
+[php]
+symbol = ""
+style = "bg:dragon_aqua"
+format = '[[ $symbol( $version) ](fg:dragon_black0 bg:dragon_aqua)]($style)'
+
+[java]
+symbol = " "
+style = "bg:dragon_aqua"
+format = '[[ $symbol( $version) ](fg:dragon_black0 bg:dragon_aqua)]($style)'
+
+[kotlin]
+symbol = ""
+style = "bg:dragon_aqua"
+format = '[[ $symbol( $version) ](fg:dragon_black0 bg:dragon_aqua)]($style)'
+
+[haskell]
+symbol = ""
+style = "bg:dragon_aqua"
+format = '[[ $symbol( $version) ](fg:dragon_black0 bg:dragon_aqua)]($style)'
+
+[python]
+symbol = ""
+style = "bg:dragon_aqua"
+format = '[[ $symbol( $version) ](fg:dragon_black0 bg:dragon_aqua)]($style)'
+
+[docker_context]
+symbol = ""
+style = "bg:dragon_black3"
+format = '[[ $symbol( $context) ](fg:dragon_blue bg:dragon_black3)]($style)'
+
+[time]
+disabled = false
+time_format = "%I:%M %p"
+style = "bg:dragon_orange"
+format = '[[  $time ](fg:dragon_black0 bg:dragon_violet)]($style)'
+
+[line_break]
+disabled = false
+
+[character]
+disabled = false
+success_symbol = '[](bold fg:dragon_green)'
+error_symbol = '[](bold fg:dragon_red)'
+vimcmd_symbol = '[](bold fg:dragon_green)' # 维持 Dragon 的冷色绿
+vimcmd_replace_one_symbol = '[](bold fg:dragon_pink)'
+vimcmd_replace_symbol = '[](bold fg:dragon_pink)'
+vimcmd_visual_symbol = '[](bold fg:dragon_blue)'
+command_timeout = 2000
